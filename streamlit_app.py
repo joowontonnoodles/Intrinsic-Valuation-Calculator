@@ -813,7 +813,6 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
               padding=20,
           )
           st.divider()
-          st.info (" copy paste the original code for the valuation summary here")
 if st.button("ADVANCED: Calculate manual intrinsic valuation (slower, accuracy based on user's inputs) The valuation is based on user's skill and knowledge", use_container_width=True):
     if ticker_input:
         with st.spinner(f"Calculating automatic valuation for {ticker_input} as a guideline..."):
