@@ -357,7 +357,7 @@ def calculate_automatic_valuation(ticker_symbol):
       # STEP 10 - COMPOSITE MULTIPLIER & FINAL VALUATION
       # ============================================================================
    
-      composite = (mult_ebitda + mult_de + mult_capex + mult_roe + mult_current ) / 6
+      composite = (mult_ebitda + mult_de + mult_capex + mult_roe + mult_current ) / 5
       adjusted_value = intrinsic_value * composite
    
       # Current price for comparison
