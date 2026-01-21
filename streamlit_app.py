@@ -430,7 +430,7 @@ def calculate_automatic_valuation(ticker_symbol):
 def calculate_manual_valuation(ticker_symbol, short_term_growth, perpetual_growth, beta_multiplier, risk_free_rate, cf1_growth, cf2_growth, cf3_growth, cf4_growth, cf5_growth, cf6_growth, cf7_growth, cf8_growth, cf9_growth, cf10_growth, multiplier):
     try:
         stock = yf.Ticker(ticker_symbol)
-        shares_outstanding = stock.info.get("sha    resOutstanding")
+        shares_outstanding = stock.info.get("sharesOutstanding")
         ar = calculate_automatic_valuation(ticker_input)
         info = stock.info 
         # Manual inputs converted to decimal
