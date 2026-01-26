@@ -512,6 +512,27 @@ def calculate_manual_valuation(ticker_symbol, short_term_growth, perpetual_growt
 
 st.title("Automating intrinsic valuation for the average person")
 
+st.markdown("""
+<div style='
+  background-color: #000000;
+  color: #FFFFFF;
+  padding: 20px;
+  font-size: 21px;
+'>
+How to use this website:
+
+1. The product will calculate the intrinsic value of the company imputed into the app. It will 
+2. explain what each metric is, what intrinsic value is, and everything that a beginner needs to know.
+3. Start by inputting the ticker of a stock into the program.
+4. Then you can select the beginner or advanced mode.
+4a. Beginner mode: a full analysis is generated for you, click on the expander boxes for explanations regarding each section of the valuation, so that you can understand the concepts
+4b. Advanced mode: a full playground for manually inputting assumptions based on your own research, and getting the intrinsic value. The values can be changed using the sliders, which are set on the automatically calculated values by default.
+5. You can see the python code behind the whole program: the entire website is fully coded using python code, and hosted by the streamlit package. Do this by clicking on the “Python code …” box
+6. You can see the full APA reference list for the written explanations by clicking on the “Reference List” box.
+
+</div>
+""", unsafe_allow_html=True)
+
 ticker_input = st.text_input("Enter Ticker Symbol (e.g., NVDA, MSFT, AAPL)").upper()
 
 st.markdown("""
@@ -804,7 +825,7 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
               st.write("**Capital Allocation:**")
               st.write(f"• CapEx Ratio: {r['capex_ratio']:.2f} → {r['mult_capex']:.2f}x")
           with st.expander ("Explanation for the growth rate"):
-            flexible_callout("""
+                flexible_callout("""
               The following are various metrics that have been found using the yfinance package, and they are all converted into a 
               multiplier that is then combined into a final multiplier that is combined with the intrinsic value to get the final value. 
 
