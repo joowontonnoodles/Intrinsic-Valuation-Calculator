@@ -873,8 +873,8 @@ with st.expander("Python code behind the whole program as of 01/26/2026", expand
             financial data and visualize the code with a website domain. 
 
    #set up the page
-#define calculate_valuation as the base code for the valuation
-#return all variables from caluculate_valuation(ticker_symbol)
+    #define calculate_valuation as the base code for the valuation
+    #return all variables from caluculate_valuation(ticker_symbol)
 #define manual_valuation as the a function that calcualtes the dcf based on the manual parameters ())
 #create teh UI, two buttons, one for manual one for automatic
 #ticker_symbol is equal to the input box for ticker symbol
@@ -892,12 +892,6 @@ if 'auto_result' not in st.session_state:
 
 if 'manual_done' not in st.session_state:
     st.session_state.manual_done = False
-
-st.markdown("""
-<style>
-  * {color: #c6c5b9 !important;}
-</style>
-""", unsafe_allow_html=True)
 
 st.image("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", width=3200)
 
@@ -1972,9 +1966,9 @@ if st.session_state.auto_result is not None:
 st.divider()
  ''')
 
-with st.expander("Full APA Reference list", expanded=False):
+with st.expander("Full APA Reference list as of 01/26/2026", expanded=False):
     st.write ("""
-References
+References (not all were used in text)
 
 Interactive Brokers. (2023). What is the intrinsic value of a stock? Retrieved from https://www.interactivebrokers.com/campus/trading-lessons/what-is-the-intrinsic-value-of-a-stock/
 
@@ -1985,6 +1979,22 @@ Preferred CFO. (2026). Leveraging financial ratios to assess company performance
 Valore Associati. (2024). Discount rates in appraisal work: The CAPM. Retrieved from https://www.valoreassociati.it/eng/articles.asp?id=14&nome=discount-rates-in-appraisal-work-the-capm
 
 Wall Street Prep. (2025). Capital asset pricing model (CAPM): Formula and calculator. Retrieved from https://www.wallstreetprep.com/knowledge/capm-capital-asset-pricing-model/
+              
+Damodaran, A. (2017). Introduction to valuation [PDF]. Stern School of Business, New York University. https://pages.stern.nyu.edu/~adamodar/pdfiles/eqnotes/ValIntrospr17.pdf
+
+Investopedia. (n.d.). Valuation. Retrieved January 26, 2026, from https://www.investopedia.com/terms/v/valuation.asp
+
+Rousell, R. A. (n.d.). yfinance: Ticker and Tickers reference. Retrieved January 26, 2026, from https://ranaroussi.github.io/yfinance/reference/yfinance.ticker_tickers.html
+
+Streamlit. (n.d.-a). Add statefulness to apps. Streamlit Documentation. Retrieved January 26, 2026, from https://docs.streamlit.io/develop/concepts/architecture/session-state
+
+Streamlit. (n.d.-b). Basic concepts of Streamlit. Streamlit Documentation. Retrieved January 26, 2026, from https://docs.streamlit.io/get-started/fundamentals/main-concepts
+
+Streamlit. (n.d.-c). Create a component. Streamlit Documentation. Retrieved January 26, 2026, from https://docs.streamlit.io/develop/concepts/custom-components
+
+Streamlit. (n.d.-d). Run your Streamlit app. Streamlit Documentation. Retrieved January 26, 2026, from https://docs.streamlit.io/develop/concepts/architecture/run-your-app
+
+Streamlit Community. (2024). Customize status callout elements (st.error, st.success, etc.) with st.flexible_callout_elements [Discussion forum post]. Streamlit Community Forum. https://discuss.streamlit.io/t/customize-status-callout-elements-st-error-st-success-etc-with-st-flexible-callout-elements/80488
     """)
 if st.session_state.auto_result is not None:
     ar = st.session_state.auto_result
