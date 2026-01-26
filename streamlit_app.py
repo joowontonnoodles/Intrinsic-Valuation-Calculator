@@ -519,15 +519,21 @@ st.markdown("""
   padding: 20px;
   font-size: 21px;
 '>
-How to use this website:
+
+The product that I created is a python program that calculates the intrinsic valuation of a 
+company based on its financials, using the packages (pips) of streamlit and yfinance to get 
+financial data and visualize the code with a website domain. The link provided is the website 
+that runs on pure python code, and is converted and hosted into a website by streamlit for free. 
+
+How to use this model :
 
 1. The product will calculate the intrinsic value of the company imputed into the app. It will explain what each metric is, what intrinsic value is, and everything that a beginner needs to know.
 2. Start by inputting the ticker of a stock into the program.
 3. Then you can select the beginner or advanced mode.
-3a. Beginner mode: a full analysis is generated for you, click on the expander boxes for explanations regarding each section of the valuation, so that you can understand the concepts
-3b. Advanced mode: a full playground for manually inputting assumptions based on your own research, and getting the intrinsic value. The values can be changed using the sliders, which are set on the automatically calculated values by default.
-4. You can see the python code behind the whole program: the entire website is fully coded using python code, and hosted by the streamlit package. Do this by clicking on the “Python code …” box
-5. You can see the full APA reference list for the written explanations by clicking on the “Reference List” box.
+4. Beginner mode: a full analysis is generated for you, click on the expander boxes for explanations regarding each section of the valuation, so that you can understand the concepts
+5. Advanced mode: a full playground for manually inputting assumptions based on your own research, and getting the intrinsic value. The values can be changed using the sliders, which are set on the automatically calculated values by default.
+6. You can see the python code behind the whole program: the entire website is fully coded using python code, and hosted by the streamlit package. Do this by clicking on the “Python code …” box
+7. You can see the full APA reference list for the written explanations by clicking on the “Reference List” box.
 
 </div>
 """, unsafe_allow_html=True)    
