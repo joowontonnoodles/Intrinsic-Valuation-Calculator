@@ -19,8 +19,6 @@ if 'auto_result' not in st.session_state:
 if 'manual_done' not in st.session_state:
     st.session_state.manual_done = False
 
-
-
 st.markdown("""
 <style>
   * {color: #c6c5b9 !important;}
@@ -33,9 +31,7 @@ st.set_page_config(page_title="Intrinsic Valuation Calculator", layout="wide")
 
 def calculate_automatic_valuation(ticker_symbol):
   try:
-      # ============================================================================
       # SETUP - Get all financial data
-      # ============================================================================
       ticker = yf.Ticker(ticker_symbol)
       income_stmt = ticker.financials
       shares_outstanding = ticker.info.get("sharesOutstanding")
@@ -54,9 +50,7 @@ def calculate_automatic_valuation(ticker_symbol):
       balance_sheet = ticker.balance_sheet
       cashflow = ticker.cashflow
    
-      # ============================================================================
       # STEP 1 - GROWTH RATE ANALYSIS (Historical + Analyst Estimates)
-      # ============================================================================
    
       # Historical revenue growth (last 3 years)
       total_revenue = income_stmt.loc["Total Revenue"].sort_index()
@@ -94,9 +88,7 @@ def calculate_automatic_valuation(ticker_symbol):
       Expected_growth_rate = (Rev_future_avg_growth + Rev_growth_historical) / 2
       g = Expected_growth_rate
    
-      # ============================================================================
       # STEP 2 - DISCOUNT RATE (CAPM)
-      # ============================================================================
    
       treasury = yf.Ticker("^TNX")
       risk_free_rate = treasury.info['regularMarketPrice'] / 100
@@ -119,9 +111,7 @@ def calculate_automatic_valuation(ticker_symbol):
    
       r = (risk_free_rate + beta * (market_return - risk_free_rate))
    
-      # ============================================================================
       # STEP 3 - PROJECT 10-YEAR CASH FLOWS (WITH TERMINAL GROWTH BLENDING)
-      # ============================================================================
    
       FCF_N = fcf_history.iloc[0] * 1.05
       Free_cash_flow_current = FCF_N
@@ -129,7 +119,7 @@ def calculate_automatic_valuation(ticker_symbol):
       # Define terminal growth rate
       terminal_growth_rate = 0.03  # 3% perpetual growth
    
-      # Years 1-3: Use analyst estimate growth rate
+      # Years 1-3: Use mix of historical and average
       # Years 4-10: Gradually blend from average growth rate (g) to terminal growth rate
       growth_rates = []
       for year in range(1, 11):
@@ -155,9 +145,7 @@ def calculate_automatic_valuation(ticker_symbol):
       CV9 = FCF_N * (1 + growth_rates[0]) * (1 + growth_rates[1]) * (1 + growth_rates[2]) * (1 + growth_rates[3]) * (1 + growth_rates[4]) * (1 + growth_rates[5]) * (1 + growth_rates[6]) * (1 + growth_rates[7]) * (1 + growth_rates[8]) ** 1
       CV10 = FCF_N * (1 + growth_rates[0]) * (1 + growth_rates[1]) * (1 + growth_rates[2]) * (1 + growth_rates[3]) * (1 + growth_rates[4]) * (1 + growth_rates[5]) * (1 + growth_rates[6]) * (1 + growth_rates[7]) * (1 + growth_rates[8]) * (1 + growth_rates[9]) ** 1
    
-      # ============================================================================
       # STEP 4 - TERMINAL VALUE (Gordon + Multiple Hybrid)
-      # ============================================================================
    
       EBITDA_at_year_N = info.get('ebitda', 0)
       perpetual_g = 0.03
@@ -186,9 +174,7 @@ def calculate_automatic_valuation(ticker_symbol):
    
       PV_TV = (PV_TV_multiple + PV_TV_gordon + market_cap_buffer) / 2 if (PV_TV_multiple + PV_TV_gordon) > 0 else 0
    
-      # ============================================================================
       # STEP 5 - DCF VALUATION
-      # ============================================================================
    
       DCF = (CV1 / (1 + r) + CV2 / ((1 + r) ** 2) + CV3 / ((1 + r) ** 3) +
              CV4 / ((1 + r) ** 4) + CV5 / ((1 + r) ** 5) + CV6 / ((1 + r) ** 6) +
@@ -198,9 +184,7 @@ def calculate_automatic_valuation(ticker_symbol):
       DCF_Per_Share = DCF / shares_outstanding
       DCF_intrinsic_value = DCF
    
-      # ============================================================================
       # STEP 6 - DDM ELIGIBILITY CHECK
-      # ============================================================================
    
       def check_ddm_conditions(ticker_obj):
           try:
@@ -217,7 +201,7 @@ def calculate_automatic_valuation(ticker_symbol):
               DDM_dividend_rate = info.get('dividendRate', 0)
               DDM_has_dividend = DDM_dividend_rate > 0
            
-              # History (5+ years)
+              # History 
               DDM_history_length = len(divs)
               DDM_has_history = DDM_history_length >= 20
            
@@ -252,9 +236,7 @@ def calculate_automatic_valuation(ticker_symbol):
    
       DDM_is_eligible, DDM_data = check_ddm_conditions(ticker)
    
-      # ============================================================================
-      # STEP 7 - DDM VALUATION (if eligible)
-      # ============================================================================
+      # STEP 7 - DDM VALUATION 
    
       DDM_intrinsic_value = None
       DDM_is_used = False
@@ -273,18 +255,14 @@ def calculate_automatic_valuation(ticker_symbol):
           except:
               DDM_is_used = False
    
-      # ============================================================================
       # STEP 8 - COMBINE DDM + DCF
-      # ============================================================================
    
       if DDM_is_used:
           intrinsic_value = (DDM_intrinsic_value + DCF_Per_Share) / 2
       else:
           intrinsic_value = DCF_Per_Share
    
-      # ============================================================================
       # STEP 9 - ADJUSTMENT MULTIPLIERS
-      # ============================================================================
    
       # EBITDA Margin
       ebitda_margin = (financials.loc['EBITDA'].iloc[0] / financials.loc['Total Revenue'].iloc[0]) * 100
@@ -352,10 +330,7 @@ def calculate_automatic_valuation(ticker_symbol):
           mult_current = 0.96
       else:
           mult_current = 0.90
-   
-      # ============================================================================
-      # STEP 10 - COMPOSITE MULTIPLIER & FINAL VALUATION
-      # ============================================================================
+         # STEP 10 - COMPOSITE MULTIPLIER & FINAL VALUATION
    
       composite = (mult_ebitda + mult_de + mult_capex + mult_roe + mult_current ) / 5
       adjusted_value = intrinsic_value * composite
@@ -364,9 +339,7 @@ def calculate_automatic_valuation(ticker_symbol):
       current_price = info.get('currentPrice', info.get('regularMarketPrice', 0))
       upside = ((adjusted_value - current_price) / current_price * 100) if current_price > 0 else 0
    
-      # ============================================================================
       # RETURN ALL RESULTS
-      # ============================================================================
    
       return {
           'ticker': ticker_symbol,
@@ -549,9 +522,16 @@ st.markdown("""
   border-radius: 10px;
   border-left: 5px solid #FFFFFF;
   margin-bottom: 20px;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1.7;
 '>
+
+This model is not perfect, ALWAYS do your research before investing. DO NOT rely on this model for investments
+This model will not be accurate for foreign stocks. Do not use this tool for 
+What is a ticker symbol?
+
+A ticker symbol is the code that is used to identify a stock or company that is available on the stock exchange. It can easily be found by just searching up *Company Name* ticker symbol.            
+
 What is this tool and what is it used for?
 
 This is a calculator that automatically calculates the intrinsic value of a stock based on the user's input, helping the user with value investment.
@@ -573,7 +553,6 @@ For most firms that reinvest their capital and do not pay dividends, DCF models 
        
 This model combines DCF (cash flow projections), DDM (dividends when applicable), and 6 financial metric based multipliers to create a weighted-final-intrinsic value.
       
-This model is not perfect, ALWAYS do your research before investing. DO NOT rely on this model for investments
 </div>
 """, unsafe_allow_html=True)
 
@@ -585,9 +564,7 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
           st.error(f"Could not fetch data for {ticker_input}, please try again!")
       else:
           r = automatic_result
-          # ================================================================
           # VALUATION SUMMARY
-          # ================================================================
           st.divider()
           st.subheader('Valuation Summary: ')
           st.caption('**This model is not perfect, ALWAYS do your research before investing. DO NOT rely on this model for investments**')
@@ -619,20 +596,34 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
               else:
                   st.info("✗ DDM Not Applicable")
           flexible_callout("""
-              What is intrinsic valuation
-              What does this value actually mean and how can you interpret it
-              How can it be interpreted
+              Intrinsic value is what a company is truly worth based on its fundamentals and future cash generation, not what the market 
+              currently prices it at (Interactive Brokers, 2023). For value investors, this metric reveals whether a stock is trading cheap or 
+              expensive relative to its actual economic value.
+              
+              You use it by comparing the value to the market price; If the intrinsic value is higher than the current price, the stock selected
+               is undervalued and is on a “discount”. If it's lower, the stock is overvalued and worth avoiding. This gap is your margin of 
+              safety, the discount at which you buy to protect against mistakes and unexpected events 
+              
+              Intrinsic value is an art that relies on assumptions about the future, it cannot be accurate. If the predicted growth rate is overly
+              optimistic, or if discount rates are incorrectly judged, or if there are any significant events that occur to the company, the 
+              value would be incorrect. This product wouldn’t work well for early stage startup companies, and highly volatile businesses.
+              
+              The approach used by this model combines the discounted cash flow model with the dividend discount model (only if the 
+              DDM is applicable), and multiplies this by a multiplier based on the company’s financials. Instead of just projecting and 
+              discounting the cash flows, it also factors in the following factors: EBITDA margin, ROE, CapEx ratio, D/E ratio, and Current 
+              ratio, which will be explained in the future. The growth rate predictions are also a gradually fading rate, which accounts for 
+              various factors, and the beta for the discount rate is based off of the market cap of the company instead of the volatility 
+              based on the index in order to allow valuations of 
+
               """,
-              background_color="#000000",    # Dark navy blue
-              font_color="#FFFFFF",          # Light yellow/gold
+              background_color="#000000",    
+              font_color="#FFFFFF",         
               font_size=16,
               alignment="left",
               line_height=1.7,
               padding=20,
           )
-          # ================================================================
           # GROWTH ANALYSIS
-          # ================================================================
           st.divider()
           st.subheader("Growth Rate Analysis")
        
@@ -644,20 +635,29 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
           with col3:
               st.metric("Expected Growth Rate (combined)", f"{r['expected_growth_rate']:.2f}%")
           flexible_callout("""
-              Why is this important?
-              What is it?
+              The growth rate is the estimate of how much a company’s revenue/cash flow will increase/decrease each year. Growth rate is 
+              the first assumption that needs to be made for intrinsic valuation, and is one of the main factors that will affect the fair value of
+              a company. DCF valuation is based on the predicted future cash flows, which are then discounted; the growth rate is what is 
+              used to predict the future cash flows. 
+
+              Here, the growth rate for the first 3 cash flows is calculated with an average of the analyst assumptions (from the yfinance 
+              package) and the historical growth of the company. The growth rate then eventually fades to the perpetual growth rate 
+              expected of the company throughout its life. 
+
+              The fade approach accounts for the fact that the high revenue growth will not be consistent throughout the whole life of the
+              company. The predicted growth rate gradually “fades” to the perpetual growth rate between the 4th to 10th years of predicted 
+              cashflow in this model. 
+
               """,
-              background_color="#000000",    # Dark navy blue
-              font_color="#FFFFFF",          # Light yellow/gold
+              background_color="#000000",    
+              font_color="#FFFFFF",         
               font_size=16,
               alignment="left",
               line_height=1.7,
               padding=20,
           )
        
-          # ================================================================
           # DISCOUNT RATE (CAPM)
-          # ================================================================
           st.divider()
           st.subheader("Discount Rate (CAPM)")
        
@@ -669,11 +669,26 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
           with col3:
               st.metric("Discount Rate (r)", f"{r['discount_rate']:.2f}%")
           flexible_callout("""
-              What is it and what does it mean?
-              Why is it important
+              
+              The discount rate is the second critical assumption in valuation, right after growth rate. The discount rate answers the 
+              question of how much the same dollar is worth in the future, it takes into account both inflation and the risk of the investment 
+              (Valore Associati, 2024). Higher risk means a higher discount rate, which cuts the value of future cash flows. Stable 
+              businesses get lower discount rates and higher valuations, while volatile stocks get penalized. 
+
+              The discount rate shrinks future cash flows back to present-day dollars. A higher discount rate means greater assumed risk of
+              the business, so future cash is valued less. A lower rate means more confidence in the company, so those future cash flows 
+              are worth more today. This is why riskier businesses get penalized with higher discount rates, resulting in lower valuations 
+              (Wall Street Prep, 2025).
+
+              In this context, it is calculated using the CAPM model, which is the Risk-Free Rate (4.29% 10y treasury growth rate) + (Beta * 
+              Equity Risk Premium). The beta is a measurement of a stock’s volatility based on the market, but it is inaccurate since not all 
+              stocks can be compared to the US market. Instead of the traditional beta, a market cap based beta is used to allow for a 
+              more diverse range of stocks: mega caps → 1.05, big cap →1.2, mid cap →1.3, small cap → 1.35, micro cap → 1.45. The 
+              equity risk premium is 3.5%
+
               """,
-              background_color="#000000",    # Dark navy blue
-              font_color="#FFFFFF",          # Light yellow/gold
+              background_color="#000000",    #
+              font_color="#FFFFFF",          
               font_size=16,
               alignment="left",
               line_height=1.7,
@@ -681,9 +696,7 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
           )
           st.caption("Formula: r = (Rf + β(Rm - Rf))")
        
-          # ================================================================
-          # 5-YEAR CASH FLOW PROJECTIONS
-          # ================================================================
+       #CASH FLOW PROJECTIONS
           st.divider()
           st.subheader("5-Year FCF Projections")
        
@@ -705,19 +718,22 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
           })
           st.table(cf_table)
           flexible_callout("""
-              This is ...
-              This is used for...
+              The above table shows the cash flows that were predicted based on the growth rate explained before. Here, the growth rate 
+              for the first 3 cash flows is calculated with an average of the analyst assumptions (from the yfinance package) and the 
+              historical growth of the company. The growth rate then eventually fades to the perpetual growth rate expected of the company 
+              throughout its life. These are the predicted cash flows that are discounted in the final DCF calculation, it is the crucial 
+              application of the growth rate. 
               """,
-              background_color="#000000",    # Dark navy blue
-              font_color="#FFFFFF",          # Light yellow/gold
+              background_color="#000000",    
+              font_color="#FFFFFF",          
               font_size=16,
               alignment="left",
               line_height=1.7,
               padding=20,
           )
-          # ================================================================
+          
           # TERMINAL VALUE
-          # ================================================================
+          
           st.divider()
           st.subheader("Terminal Value Calculation")
        
@@ -729,13 +745,20 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
           with col3:
               st.metric("Hybrid Average TV (PV)", f"${r['pv_tv_final']:,.0f}")
           flexible_callout("""
-              What is the terminal value in intrinsic valuation
-              What does it mean?
-                           explain the assumptions used
-                           What multiples were used whata the perpetual growth rate
+              Terminal value is the estimated value of a business's future cash flows beyond the 10 year predictions in the valuation, 
+              representing most of the company's total worth. Two terminal value calculations were used and combined in this model: the 
+              Gordon Growth Model and the Exit Multiple method. 
+              
+              The Gordon Growth Method assumes constant growth forever. Formula: TV = (CV10 * (1 + g)) / (r - g). Where g is the 
+              perpetual growth rate, and r is the discount rate. (perpetual growth rate is 3%). PV_TV_gordon = TV_gordon / ((1 + r) ** 
+              number_of_years_TV) * TV_Gordon_extra_multiple
+                            
+              The Exit Multiple method is the following formula: TV = Final Year EBITDA * Exit Multiple, where the exit multiple is 10.0.           
+              PV_TV_multiple = TV_multiple / ((1 + r) ** number_of_years_TV) * Tv_multiple_extra_multiple
+
               """,
-              background_color="#000000",    # Dark navy blue
-              font_color="#FFFFFF",          # Light yellow/gold
+              background_color="#000000",    
+              font_color="#FFFFFF",          
               font_size=16,
               alignment="left",
               line_height=1.7,
@@ -743,9 +766,7 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
           )
           st.caption("Terminal value combines Gordon Growth Model, EBITDA multiple exit, and market cap buffer")
        
-          # ================================================================
           # DCF DETAILS
-          # ================================================================
           st.divider()
           st.subheader("Discounted-Cash-Flow Valuation Details")
        
@@ -756,9 +777,7 @@ if st.button("BEGINNERS: Calculate automatic intrinsic valuation (less accurate 
               st.metric("DCF per Share", f"${r['dcf_per_share']:.2f}")
           with col3:
               st.metric("Market Cap", f"${r['market_cap']:,.0f}")
-          # ================================================================
           # ADJUSTMENT MULTIPLIERS
-          # ================================================================
           st.divider()
           st.subheader("Financial metrics Adjustment Multipliers")
        
