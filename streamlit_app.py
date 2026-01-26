@@ -819,7 +819,7 @@ if st.button("ADVANCED: Calculate manual intrinsic valuation (slower, accuracy b
             st.session_state.auto_result = calculate_automatic_valuation(ticker_input)
     else:
         st.error("Please enter a ticker symbol!")
-with st.expander("Python code behind the whole program", expanded=True):
+with st.expander("Python code behind the whole program", expanded=False):
     st.write ("""
     
     the following is the code for the python program as of 01/26/2026
