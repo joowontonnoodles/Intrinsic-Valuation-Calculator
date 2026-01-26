@@ -522,7 +522,7 @@ st.markdown("""
   border-radius: 10px;
   border-left: 5px solid #FFFFFF;
   margin-bottom: 20px;
-  font-size: 20px;
+  font-size: 15px;
   line-height: 1.7;
 '>
 
@@ -819,7 +819,19 @@ if st.button("ADVANCED: Calculate manual intrinsic valuation (slower, accuracy b
             st.session_state.auto_result = calculate_automatic_valuation(ticker_input)
     else:
         st.error("Please enter a ticker symbol!")
+with st.expander("Python code behind the whole program", expanded=True):
+    st.write ("""
+    
+    the following is the code for the python program as of 01/26/2026
+    
+            The product that I created is a python program that calculates the intrinsic valuation of a 
+            company based on its financials, using the packages (pips) of streamlit and yfinance to get 
+            financial data and visualize the code with a website domain. 
 
+            
+              
+            
+    """)
 # ADVANCED SECTION DISPLAYS HERE - OUTSIDE BUTTON
 if st.session_state.auto_result is not None:
     ar = st.session_state.auto_result
@@ -1038,8 +1050,6 @@ if st.session_state.auto_result is not None:
         else:
             st.error("Error calculating manual valuation. Please try again.")
                            
-
-
 st.divider()
-st.caption(f"Analysis generated {datetime.now().strftime('%Y-%m-%d %H:%M')} HKT")
+
 
