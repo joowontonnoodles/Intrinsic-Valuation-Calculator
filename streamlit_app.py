@@ -527,6 +527,7 @@ st.markdown("""
   padding: 20px;
   font-size: 21px;
 '>
+IF THE BACKGROUND IS WHITE CLICK THE 3 DOTS ON THE TOP RIGHT OF THE SCREEN --> Settings --> Dark
 
 The product that I created is a python program that calculates the intrinsic valuation of a 
 company based on its financials, using the packages (pips) of streamlit and yfinance to get 
